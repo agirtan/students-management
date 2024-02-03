@@ -4,22 +4,24 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.io.Serializable;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Entity
-public class StudentModel implements Serializable {
+
+public class CourseModel implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(nullable = false,updatable = false)
+    @Column
     private Long id;
-    private String name;
-    private String email;
-    private String courses;
-    private String phone;
-    private String imageUrl;
+    @Column(nullable = false,updatable = false)
+    private String courseCode;
+    private String courseName;
+    private String faculty;
+    private String headFaculty;
     @Column(nullable = false,updatable = false)
     private String studentCode;
 

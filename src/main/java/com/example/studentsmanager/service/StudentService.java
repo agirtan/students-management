@@ -25,6 +25,7 @@ public class StudentService {
     }
 
     public List<StudentModel> findAllStudents(){
+
         return studentRepository.findAll();
     }
 
@@ -34,10 +35,11 @@ public class StudentService {
 
     public StudentModel findStudentById(Long id){
         return studentRepository.findStudentById(id)
-                        .orElseThrow(()->new UserNotFound("User by id" + id+"was not found!"));
+                        .orElseThrow(()->new UserNotFound("User by id " + id+ " was not found!"));
     }
 
     public void deleteStudent(Long id){
+
         studentRepository.deleteStudentById(id);
     }
 }
