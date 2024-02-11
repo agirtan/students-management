@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/course")
@@ -18,9 +19,9 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    @GetMapping("/all")
-    public ResponseEntity<List<CourseModel>>getAllCourses(){
-        List<CourseModel>courses=courseService.findAllCourses();
+    @GetMapping ("/all")
+    public ResponseEntity<List<CourseDTO>> getAllCourses() {
+        List<CourseDTO> courses = courseService.findAllCourses();
         return new ResponseEntity<>(courses, HttpStatus.OK);
     }
 

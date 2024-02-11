@@ -1,9 +1,6 @@
 package com.example.studentsmanager.DTOs;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
@@ -17,4 +14,6 @@ public class CourseDTO {
     private Long courseCode;
     private List<StudentDTO> students;
 
+    public CourseDTO(String courseName, Long courseCode) {
+    }
 }

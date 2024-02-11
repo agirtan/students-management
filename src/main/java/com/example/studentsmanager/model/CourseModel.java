@@ -24,7 +24,7 @@ public class CourseModel {
     @Column(nullable = false,updatable = false)
     private Long courseCode;
 
-    @ManyToMany(mappedBy="courses",fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy="courses",fetch = FetchType.EAGER)
 
     private Set<StudentModel> students;
 

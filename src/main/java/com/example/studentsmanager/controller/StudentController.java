@@ -1,5 +1,7 @@
 package com.example.studentsmanager.controller;
 
+import com.example.studentsmanager.DTOs.DTOConverter;
+import com.example.studentsmanager.DTOs.StudentDTO;
 import com.example.studentsmanager.model.StudentModel;
 import com.example.studentsmanager.service.StudentService;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/student")
@@ -18,15 +21,18 @@ public class StudentController {
 
 
     @GetMapping("/all")
-    public ResponseEntity<List<StudentModel>>getAllStudents(){
-        List<StudentModel>students=studentService.findAllStudents();
+    public ResponseEntity<List<StudentDTO>> getAllStudents() {
+        List<StudentDTO> students = studentService.findAllStudents() // Adjust this method to return List<StudentDTO>
+                .stream()
+                .map(DTOConverter::convertToStudentDTO)
+                .collect(Collectors.toList());
         return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<StudentModel>getStudentById(@PathVariable Long id){
-        StudentModel student = studentService.findStudentById(id);
-        return new ResponseEntity<>(student, HttpStatus.OK);
+    public ResponseEntity<StudentDTO> getStudentById(@PathVariable Long id) {
+        StudentDTO studentDTO = studentService.findStudentById(id); // Make sure this method returns StudentDTO
+        return new ResponseEntity<>(studentDTO, HttpStatus.OK);
     }
 
     @PostMapping()
