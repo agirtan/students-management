@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface CourseRepository extends JpaRepository<CourseModel,String> {
 
-    void deleteCourseByName(String courseName);
-    Optional<CourseModel> findCourseByName(String courseName);
+    void deleteCourseByCourseName(String courseName);
+    Optional<CourseModel> findCourseByCourseName(String courseName);
+
 }

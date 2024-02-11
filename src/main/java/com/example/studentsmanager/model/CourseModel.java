@@ -1,28 +1,39 @@
 package com.example.studentsmanager.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
+import java.util.Random;
+import java.util.Set;
 
-import java.io.Serializable;
-
+@Data
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
 @Entity
+@Table(name="courses")
+public class CourseModel {
 
-public class CourseModel implements Serializable {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Long id;
-    @Column(nullable = false,updatable = false)
-    private String courseCode;
+    @Column(nullable = false, updatable = true, unique = false)
     private String courseName;
-    private String faculty;
-    private String headFaculty;
+
     @Column(nullable = false,updatable = false)
-    private String studentCode;
+    private Long courseCode;
+
+    @ManyToMany(mappedBy="courses",fetch = FetchType.LAZY)
+    @JsonBackReference
+    private Set<StudentModel> students;
+
+
+    @PrePersist
+    public void generateCourseCode() {
+        // Generate a 3-digit course code (you can customize this as needed)
+        Random random = new Random();
+        int generatedCode = random.nextInt(9000) + 1000; // Generates a random 3-digit number
+        this.courseCode = (long) generatedCode;
+    }
 
 }

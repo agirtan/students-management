@@ -2,44 +2,57 @@ package com.example.studentsmanager.service;
 
 import com.example.studentsmanager.exception.UserNotFound;
 import com.example.studentsmanager.model.StudentModel;
+import com.example.studentsmanager.repository.CourseRepository;
 import com.example.studentsmanager.repository.StudentRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.UUID;
+
 
 @Service
+@RequiredArgsConstructor
 public class StudentService {
 
     private final StudentRepository studentRepository;
-    @Autowired
-    public StudentService(StudentRepository studentRepository) {
+    private final CourseRepository courseRepository;
 
-        this.studentRepository = studentRepository;
+    public StudentModel addStudent(StudentModel student) {
+
+        return studentRepository.save(student);
     }
 
-    public StudentModel addStudent(StudentModel studentModel){
-        studentModel.setStudentCode(UUID.randomUUID().toString());
-        return studentRepository.save(studentModel);
-    }
-
-    public List<StudentModel> findAllStudents(){
+    public List<StudentModel> findAllStudents() {
 
         return studentRepository.findAll();
     }
 
-    public StudentModel updateStudent(StudentModel studentModel){
+//    public void enrollStudent(Long id, EnrollmentRequest request) {
+//        StudentModel student = studentRepository.findStudentById(id)
+//                .orElseThrow(() -> new UserNotFound("Student not found with the id:" + id));
+//
+//        CourseModel course = courseRepository.findCourseByCourseName(request.courseName())
+//                .orElseThrow(() -> new CourseNotFoundException("Course not found with the name: " + request.courseName()));
+//
+//        if (!student.getCourses().contains(course)) {
+//            student.getCourses().add(course);  // Enroll the student in the course
+//            studentRepository.save(student);
+//        } else {
+//            // Handle case where student is already enrolled
+//            throw new EnrollmentException("Student is already enrolled in the course.");
+//        }
+//    }
+
+    public StudentModel updateStudent(StudentModel studentModel) {
         return studentRepository.save(studentModel);
     }
 
-    public StudentModel findStudentById(Long id){
+    public StudentModel findStudentById(Long id) {
         return studentRepository.findStudentById(id)
-                        .orElseThrow(()->new UserNotFound("User by id " + id+ " was not found!"));
+                .orElseThrow(() -> new UserNotFound("User by id " + id + " was not found!"));
     }
 
-    public void deleteStudent(Long id){
-
+    public void deleteStudent(Long id) {
         studentRepository.deleteStudentById(id);
     }
 }

@@ -3,24 +3,24 @@ package com.example.studentsmanager.service;
 import com.example.studentsmanager.exception.UserNotFound;
 import com.example.studentsmanager.model.CourseModel;
 import com.example.studentsmanager.repository.CourseRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class CourseService {
 
     private final CourseRepository courseRepository;
 
-    @Autowired
-    public CourseService(CourseRepository courseRepository){
-        this.courseRepository=courseRepository;
-    }
 
-    public CourseModel addCourse(CourseModel courseModel){
-        courseModel.setCourseCode(UUID.randomUUID().toString());
+    public CourseModel addCourse( CourseModel courseModel){
+        // Assuming you want to set the same courseName, you can directly use it in the save method.
         return courseRepository.save(courseModel);
     }
 
@@ -33,11 +33,11 @@ public class CourseService {
     }
 
     public CourseModel findCourseByName(String courseName){
-        return courseRepository.findCourseByName(courseName)
+        return courseRepository.findCourseByCourseName(courseName)
                 .orElseThrow(()->new UserNotFound("Course "+ courseName + "was not found"));
     }
 
-    public void deleteCourseByName(String courseName) {
-        courseRepository.deleteCourseByName(courseName) ;
+    public void deleteCourseByCourseName(String courseName) {
+        courseRepository.deleteCourseByCourseName(courseName);
     }
 }

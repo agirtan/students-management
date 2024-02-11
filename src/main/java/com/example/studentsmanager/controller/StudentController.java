@@ -2,6 +2,7 @@ package com.example.studentsmanager.controller;
 
 import com.example.studentsmanager.model.StudentModel;
 import com.example.studentsmanager.service.StudentService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,13 +11,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/student")
+@RequiredArgsConstructor
 public class StudentController {
 
     private final StudentService studentService;
 
-    public StudentController(StudentService studentService) {
-        this.studentService = studentService;
-    }
 
     @GetMapping("/all")
     public ResponseEntity<List<StudentModel>>getAllStudents(){
@@ -30,7 +29,7 @@ public class StudentController {
         return new ResponseEntity<>(student, HttpStatus.OK);
     }
 
-    @PostMapping("/add")
+    @PostMapping()
     public  ResponseEntity<StudentModel> addStudent(@RequestBody StudentModel student){
         StudentModel newStudent = studentService.addStudent(student);
         return new ResponseEntity<>(newStudent, HttpStatus.CREATED);
@@ -44,11 +43,15 @@ public class StudentController {
 
     @DeleteMapping ("/delete/{id}")
     public  ResponseEntity<?> deleteStudent(@PathVariable("id")Long id){
-         studentService.deleteStudent(id);
+        studentService.deleteStudent(id);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
 
 
-
+//    @PostMapping("/enrollment/{id}")
+//    public ResponseEntity<StudentModel> enrollStudent(@PathVariable("id") Long id, @RequestParam("course") String course) {
+//        studentService.enrollStudent(id, course);
+//        return new ResponseEntity<>(HttpStatus.CREATED);
+//    }
 }
