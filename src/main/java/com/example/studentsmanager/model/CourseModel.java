@@ -1,6 +1,7 @@
 package com.example.studentsmanager.model;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Random;
@@ -17,14 +18,14 @@ import java.util.Set;
 public class CourseModel {
 
     @Id
-    @Column(nullable = false, updatable = true, unique = false)
+    @Column(nullable = false, updatable = true, unique = true)
     private String courseName;
 
     @Column(nullable = false,updatable = false)
     private Long courseCode;
 
     @ManyToMany(mappedBy="courses",fetch = FetchType.LAZY)
-    @JsonBackReference
+
     private Set<StudentModel> students;
 
 
