@@ -1,5 +1,7 @@
 package com.example.studentsmanager.controller;
 
+import com.example.studentsmanager.DTOs.CourseDTO;
+import com.example.studentsmanager.DTOs.DTOConverter;
 import com.example.studentsmanager.model.CourseModel;
 import com.example.studentsmanager.service.CourseService;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +25,10 @@ public class CourseController {
     }
 
     @GetMapping("/{coursename}")
-    public ResponseEntity<CourseModel>getCourseByCourseName(@PathVariable String coursename){
-        CourseModel course = courseService.findCourseByName(coursename);
-        return new ResponseEntity<>(course,HttpStatus.OK);
+    public ResponseEntity<CourseDTO> getCourseByCourseName(@PathVariable String coursename) {
+        // Directly receive CourseDTO from the service
+        CourseDTO courseDTO = courseService.findCourseByName(coursename);
+        return new ResponseEntity<>(courseDTO, HttpStatus.OK);
     }
 
     @PostMapping("/add")
