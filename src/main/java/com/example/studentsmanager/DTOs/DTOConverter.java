@@ -1,48 +1,122 @@
 package com.example.studentsmanager.DTOs;
 
 import com.example.studentsmanager.model.CourseModel;
+import com.example.studentsmanager.model.EnrollmentModel;
 import com.example.studentsmanager.model.StudentModel;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-@RequiredArgsConstructor
+@Component
+@NoArgsConstructor
 
 public class DTOConverter {
 
-    public static CourseDTO convertToCourseDTO(CourseModel course) {
-        CourseDTO dto = new CourseDTO();
-        dto.setCourseName(course.getCourseName());
-        dto.setCourseCode(course.getCourseCode());
-
-        List<StudentDTO> studentDTOs = Optional.ofNullable(course.getStudents())
-                .orElse(Collections.emptySet()) // Handle null
+    public CourseDTO convertToCourseDTO(CourseModel courseModel) {
+        CourseDTO courseDTO = new CourseDTO();
+        courseDTO.setId(courseModel.getId());
+        courseDTO.setCourseName(courseModel.getCourseName());
+        // Avoid deep conversion here, consider creating a simplified version if necessary
+        List<EnrollmentDTO> enrollmentDTOs = courseModel.getEnrollments()
                 .stream()
-                .map(student -> new StudentDTO(student.getId(), student.getName(), student.getEmail(), null)) // Adjust constructor as necessary
+                .map(enrollment -> {
+                    EnrollmentDTO dto = new EnrollmentDTO();
+                    dto.setId(enrollment.getId());
+                    // Set only IDs for student and course to avoid recursion
+                    StudentDTO studentDTO = new StudentDTO();
+                    studentDTO.setId(enrollment.getStudent().getId());
+                    dto.setStudent(studentDTO);
+
+                    CourseDTO minimalCourseDTO = new CourseDTO();
+                    minimalCourseDTO.setId(enrollment.getCourse().getId());
+                    dto.setCourse(minimalCourseDTO);
+
+                    return dto;
+                })
                 .collect(Collectors.toList());
+        courseDTO.setEnrollments(enrollmentDTOs);
 
-        dto.setStudents(studentDTOs.isEmpty() ? null : studentDTOs); // Set to null or empty list based on your preference
-
-        return dto;
+        return courseDTO;
     }
 
-    public static StudentDTO convertToStudentDTO(StudentModel student) {
-        StudentDTO dto = new StudentDTO();
-        dto.setId(student.getId()); // Assuming StudentDTO also has an id field
-        dto.setName(student.getName());
-        dto.setEmail(student.getEmail()); // Assuming StudentDTO also has an email field
 
-        if (student.getCourses() != null && !student.getCourses().isEmpty()) {
-            List<CourseDTO> courseDTOS = student.getCourses().stream()
-                    .map(course -> new CourseDTO(course.getCourseName(), course.getCourseCode()))
-                    .collect(Collectors.toList());
-            dto.setCourses(courseDTOS); // Make sure StudentDTO has a setter for courses list
-        }
+    public CourseModel convertToCourseEntity(CourseDTO courseDTO) {
+        CourseModel courseModel = new CourseModel();
+        courseModel.setId(courseDTO.getId());
+        courseModel.setCourseName(courseDTO.getCourseName());
+        List<EnrollmentModel> enrollments = Optional.ofNullable(courseDTO.getEnrollments()) // Wrap with Optional
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .map(this::convertToEnrollmentEntity)
+                .collect(Collectors.toList());
+        courseModel.setEnrollments(enrollments);
 
-        return dto;
+        return courseModel;
+    }
+
+    public StudentDTO convertToStudentDTO(StudentModel studentModel) {
+        StudentDTO studentDTO = new StudentDTO();
+        studentDTO.setId(studentModel.getId());
+        studentDTO.setName(studentModel.getName());
+        studentDTO.setEmail(studentModel.getEmail());
+        studentDTO.setStudentCode(studentModel.getStudentCode());
+
+        List<EnrollmentDTO> enrollmentDTOs = studentModel.getEnrollments()
+                .stream()
+                .map(enrollment -> {
+                    EnrollmentDTO dto = new EnrollmentDTO();
+                    dto.setId(enrollment.getId());
+
+                    CourseDTO courseDTO = new CourseDTO();
+                    courseDTO.setId(enrollment.getCourse().getId());
+                    courseDTO.setCourseName(enrollment.getCourse().getCourseName());
+                    dto.setCourse(courseDTO);
+                    return dto;
+                })
+                .collect(Collectors.toList());
+        studentDTO.setEnrollments(enrollmentDTOs);
+
+        return studentDTO;
+    }
+
+    public StudentModel convertToStudentEntity(StudentDTO studentDTO) {
+        StudentModel studentModel = new StudentModel();
+        studentModel.setId(studentDTO.getId());
+        studentModel.setName(studentDTO.getName());
+        studentModel.setEmail(studentDTO.getEmail());
+        studentModel.setStudentCode(studentDTO.getStudentCode());
+
+        List<EnrollmentModel> enrollments = Optional.ofNullable(studentDTO.getEnrollments())
+                .orElseGet(Collections::emptyList)
+                .stream()
+                .map(this::convertToEnrollmentEntity)
+                .collect(Collectors.toList());
+        studentModel.setEnrollments(enrollments);
+
+        return studentModel;
+    }
+
+    public EnrollmentDTO convertToEnrollmentDTO(EnrollmentModel enrollment) {
+        EnrollmentDTO enrollmentDTO = new EnrollmentDTO();
+        enrollmentDTO.setId(enrollment.getId());
+        StudentDTO studentDTO = new StudentDTO();
+        studentDTO.setId(enrollment.getStudent().getId());
+        enrollmentDTO.setStudent(studentDTO);
+        CourseDTO courseDTO = new CourseDTO();
+        courseDTO.setId(enrollment.getCourse().getId());
+        enrollmentDTO.setCourse(courseDTO);
+        return enrollmentDTO;
+    }
+    public EnrollmentModel convertToEnrollmentEntity(EnrollmentDTO enrollmentDTO) {
+        EnrollmentModel enrollmentModel = new EnrollmentModel();
+        enrollmentModel.setId(enrollmentDTO.getId());
+        enrollmentModel.setStudent(convertToStudentEntity(enrollmentDTO.getStudent()));
+        enrollmentModel.setCourse(convertToCourseEntity(enrollmentDTO.getCourse()));
+        return enrollmentModel;
     }
 }
-

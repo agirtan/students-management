@@ -9,44 +9,62 @@ import com.example.studentsmanager.repository.StudentRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.Hibernate;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
-@RequiredArgsConstructor
 public class StudentService {
 
     private final StudentRepository studentRepository;
-    private final CourseRepository courseRepository;
+    private final DTOConverter dtoConverter;
 
-    public StudentModel addStudent(StudentModel student) {
+    @Autowired
+    public StudentService (StudentRepository studentRepository,DTOConverter dtoConverter){
+        this.studentRepository=studentRepository;
+        this.dtoConverter=dtoConverter;
+    }
+    //ADD STUDENT
+    public StudentDTO addStudent(StudentDTO studentDTO) {
+        StudentModel studentModel = dtoConverter.convertToStudentEntity(studentDTO);
+        StudentModel savedStudent = studentRepository.save(studentModel);
+        return dtoConverter.convertToStudentDTO(savedStudent);
+    }
+    //FIND ALL
+    public List<StudentDTO> findAllStudents() {
+        List<StudentModel> students = studentRepository.findAll();
+        return students.stream()
+                .map(dtoConverter::convertToStudentDTO)
+                .collect(Collectors.toList());
+    }
+    //FIND BY ID
 
-        return studentRepository.save(student);
+    public StudentDTO findStudentById(Long id){
+        StudentModel studentModel = studentRepository.findById(id)
+                .orElseThrow(()-> new UserNotFound("Student with the provided id not found"));
+        return dtoConverter.convertToStudentDTO(studentModel);
+    }
+    //UPDATE
+    public StudentDTO updateStudent(Long studentId, StudentDTO updateStudent) {
+        StudentModel existingStudent = studentRepository.findById(studentId)
+                .orElseThrow(()-> new UserNotFound("Student with the provided id not found"));
+
+        existingStudent.setName(updateStudent.getName());
+        existingStudent.setStudentCode(updateStudent.getStudentCode());
+        existingStudent.setEmail(updateStudent.getEmail());
+        StudentModel updatedStudent = studentRepository.save(existingStudent);
+        return dtoConverter.convertToStudentDTO(updatedStudent);
     }
 
-    public List<StudentModel> findAllStudents() {
-
-        return studentRepository.findAll();
-    }
-
-
-
-    public StudentModel updateStudent(StudentModel studentModel) {
-        return studentRepository.save(studentModel);
-    }
-
-    @Transactional(readOnly = true)
-    public StudentDTO findStudentById(Long id) {
-        StudentModel student = studentRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Student not found with id: " + id));
-        Hibernate.initialize(student.getCourses());
-        return DTOConverter.convertToStudentDTO(student); // Direct method call
-    }
-
-    public void deleteStudent(Long id) {
-        studentRepository.deleteStudentById(id);
+    //DELETE
+    public void deleteStudent(Long studentId){
+        StudentModel studentModel = studentRepository.findById(studentId)
+                .orElseThrow(()-> new UserNotFound("Student with the provided id not found"));
+        studentRepository.deleteById(studentId);
     }
 }

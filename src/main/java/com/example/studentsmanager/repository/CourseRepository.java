@@ -7,9 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CourseRepository extends JpaRepository<CourseModel,String> {
-
-    void deleteCourseByCourseName(String courseName);
-    Optional<CourseModel> findCourseByCourseName(String courseName);
+public interface CourseRepository extends JpaRepository<CourseModel,Long> {
 
 }
