@@ -3,40 +3,34 @@ package com.example.studentsmanager.service;
 import com.example.studentsmanager.DTOs.CourseDTO;
 import com.example.studentsmanager.DTOs.DTOConverter;
 import com.example.studentsmanager.exception.CourseNotFoundException;
-import com.example.studentsmanager.exception.UserNotFound;
 import com.example.studentsmanager.model.CourseModel;
 import com.example.studentsmanager.repository.CourseRepository;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestBody;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.springframework.data.jpa.domain.AbstractPersistable_.id;
 
 @Service
 public class CourseService {
     private final CourseRepository courseRepository;
     private final DTOConverter dtoConverter;
 
-    @Autowired // Or preferably, use constructor injection
+    @Autowired
     public CourseService(CourseRepository courseRepository, DTOConverter dtoConverter) {
         this.courseRepository = courseRepository;
         this.dtoConverter = dtoConverter;
     }
 
-    public CourseDTO addCourse(CourseDTO courseDTO) {
-        CourseModel courseModel = dtoConverter.convertToCourseEntity(courseDTO);
-        CourseModel savedCourse = courseRepository.save(courseModel);
-        return dtoConverter.convertToCourseDTO(savedCourse);
+    public List<CourseDTO> addCourses(List<CourseDTO> courseDTOs) {
+        List<CourseModel> courseModels = courseDTOs.stream()
+                .map(dtoConverter::convertToCourseEntity)
+                .collect(Collectors.toList());
+        List<CourseModel> savedCourses = courseRepository.saveAll(courseModels);
+        return savedCourses.stream()
+                .map(dtoConverter::convertToCourseDTO)
+                .collect(Collectors.toList());
     }
 
     public List<CourseDTO> findAllCourses() {

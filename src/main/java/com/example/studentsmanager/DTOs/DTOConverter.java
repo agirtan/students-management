@@ -3,9 +3,7 @@ package com.example.studentsmanager.DTOs;
 import com.example.studentsmanager.model.CourseModel;
 import com.example.studentsmanager.model.EnrollmentModel;
 import com.example.studentsmanager.model.StudentModel;
-import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -21,20 +19,19 @@ public class DTOConverter {
         CourseDTO courseDTO = new CourseDTO();
         courseDTO.setId(courseModel.getId());
         courseDTO.setCourseName(courseModel.getCourseName());
-        // Avoid deep conversion here, consider creating a simplified version if necessary
+
         List<EnrollmentDTO> enrollmentDTOs = courseModel.getEnrollments()
                 .stream()
                 .map(enrollment -> {
                     EnrollmentDTO dto = new EnrollmentDTO();
-                    dto.setId(enrollment.getId());
-                    // Set only IDs for student and course to avoid recursion
+
+
                     StudentDTO studentDTO = new StudentDTO();
                     studentDTO.setId(enrollment.getStudent().getId());
+                    studentDTO.setName(enrollment.getStudent().getName());
+                    studentDTO.setStudentCode(enrollment.getStudent().getStudentCode());
                     dto.setStudent(studentDTO);
 
-                    CourseDTO minimalCourseDTO = new CourseDTO();
-                    minimalCourseDTO.setId(enrollment.getCourse().getId());
-                    dto.setCourse(minimalCourseDTO);
 
                     return dto;
                 })
@@ -45,10 +42,13 @@ public class DTOConverter {
     }
 
 
+
+
     public CourseModel convertToCourseEntity(CourseDTO courseDTO) {
         CourseModel courseModel = new CourseModel();
         courseModel.setId(courseDTO.getId());
         courseModel.setCourseName(courseDTO.getCourseName());
+
         List<EnrollmentModel> enrollments = Optional.ofNullable(courseDTO.getEnrollments()) // Wrap with Optional
                 .orElseGet(Collections::emptyList)
                 .stream()

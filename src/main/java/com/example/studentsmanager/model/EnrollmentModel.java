@@ -6,9 +6,10 @@ import lombok.*;
 @Data
 @Getter
 @Setter
+@ToString
+@Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity
 @Table(name="enrollments")
 public class EnrollmentModel {
     @Id
@@ -16,10 +17,10 @@ public class EnrollmentModel {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "student_id") // Change to reference the StudentModel
+    @JoinColumn(name = "student_id")
     private StudentModel student;
 
     @ManyToOne
-    @JoinColumn(name = "course_id")  // Change to reference the CourseModel
+    @JoinColumn(name = "course_id")
     private CourseModel course;
 }

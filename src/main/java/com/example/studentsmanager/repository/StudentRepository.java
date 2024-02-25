@@ -11,5 +11,5 @@ import java.util.UUID;
 @Repository
 public interface StudentRepository extends JpaRepository<StudentModel,Long> {
 
-
+    boolean existsByStudentCode(Long studentCode);
 }

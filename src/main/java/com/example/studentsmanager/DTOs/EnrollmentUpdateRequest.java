@@ -9,8 +9,9 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
-public class EnrollmentRequest {
+public class EnrollmentUpdateRequest {
 
-    private Long studentId;
-    private List<Long> courseIds;
+    private Long newStudentId;
+    private Long newCourseId;
 }
+

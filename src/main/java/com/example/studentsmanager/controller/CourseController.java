@@ -1,19 +1,12 @@
 package com.example.studentsmanager.controller;
 
 import com.example.studentsmanager.DTOs.CourseDTO;
-import com.example.studentsmanager.DTOs.DTOConverter;
-import com.example.studentsmanager.model.CourseModel;
 import com.example.studentsmanager.service.CourseService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
-import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/course")
@@ -29,6 +22,7 @@ public class CourseController {
     @GetMapping("/all")
     public ResponseEntity<List<CourseDTO>> getAllCourses() {
         List<CourseDTO> courses = courseService.findAllCourses();
+        courses.forEach(course->course.setEnrollments(null));
         return ResponseEntity.ok(courses); // Shorthand, same as HttpStatus.OK
     }
 
@@ -39,10 +33,9 @@ public class CourseController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<CourseDTO> addCourse(@RequestBody CourseDTO courseDTO) {
-        CourseDTO addedCourse = courseService.addCourse(courseDTO);
-        return new ResponseEntity<>(addedCourse, HttpStatus.CREATED);
-
+    public ResponseEntity<List<CourseDTO>> addCourses(@RequestBody List<CourseDTO> courseDTOs) {
+        List<CourseDTO> savedCourses = courseService.addCourses(courseDTOs);
+        return new ResponseEntity<>(savedCourses, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
@@ -55,7 +48,7 @@ public class CourseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteCourse(@PathVariable Long id) {
         courseService.deleteCourse(id);
-        return ResponseEntity.noContent().build(); // 204 No Content is suitable for deletions
+        return ResponseEntity.noContent().build();
     }
 }
 
