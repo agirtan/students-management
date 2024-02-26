@@ -30,9 +30,8 @@ public class DTOConverter {
                     studentDTO.setId(enrollment.getStudent().getId());
                     studentDTO.setName(enrollment.getStudent().getName());
                     studentDTO.setStudentCode(enrollment.getStudent().getStudentCode());
+
                     dto.setStudent(studentDTO);
-
-
                     return dto;
                 })
                 .collect(Collectors.toList());
@@ -40,8 +39,6 @@ public class DTOConverter {
 
         return courseDTO;
     }
-
-
 
 
     public CourseModel convertToCourseEntity(CourseDTO courseDTO) {
@@ -75,6 +72,7 @@ public class DTOConverter {
                     CourseDTO courseDTO = new CourseDTO();
                     courseDTO.setId(enrollment.getCourse().getId());
                     courseDTO.setCourseName(enrollment.getCourse().getCourseName());
+
                     dto.setCourse(courseDTO);
                     return dto;
                 })
@@ -104,14 +102,19 @@ public class DTOConverter {
     public EnrollmentDTO convertToEnrollmentDTO(EnrollmentModel enrollment) {
         EnrollmentDTO enrollmentDTO = new EnrollmentDTO();
         enrollmentDTO.setId(enrollment.getId());
+
         StudentDTO studentDTO = new StudentDTO();
         studentDTO.setId(enrollment.getStudent().getId());
         enrollmentDTO.setStudent(studentDTO);
+
         CourseDTO courseDTO = new CourseDTO();
         courseDTO.setId(enrollment.getCourse().getId());
         enrollmentDTO.setCourse(courseDTO);
+
         return enrollmentDTO;
     }
+
+
     public EnrollmentModel convertToEnrollmentEntity(EnrollmentDTO enrollmentDTO) {
         EnrollmentModel enrollmentModel = new EnrollmentModel();
         enrollmentModel.setId(enrollmentDTO.getId());
