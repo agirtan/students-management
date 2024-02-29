@@ -1,9 +1,14 @@
 package com.example.studentsmanager.controller;
 
 
+import com.example.studentsmanager.DTOs.ResponsePayload;
 import com.example.studentsmanager.DTOs.StudentDTO;
+import com.example.studentsmanager.controller.util.ResponseBuilder;
+import com.example.studentsmanager.exception.StudentAlreadyEnrolledException;
 import com.example.studentsmanager.service.StudentService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,16 +17,19 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/student")
-@RequiredArgsConstructor
 public class StudentController {
 
     private final StudentService studentService;
+
+    public StudentController(StudentService studentService){
+        this.studentService=studentService;
+    }
 
 
     @GetMapping("/all")
     public ResponseEntity<List<StudentDTO>> getAllStudents() {
         List<StudentDTO> students = studentService.findAllStudents();
-        // Clear the enrollments list for each student
+
         students.forEach(student -> student.setEnrollments(null));
         return ResponseEntity.ok(students);
     }
@@ -38,9 +46,13 @@ public class StudentController {
 
     //ADD STUDENTS
     @PostMapping()
-    public ResponseEntity<StudentDTO> addStudent(@RequestBody StudentDTO student) {
-        StudentDTO newStudent = studentService.addStudent(student);
-        return new ResponseEntity<>(newStudent, HttpStatus.CREATED);
+    public ResponseEntity<ResponsePayload> addStudent(@Valid @RequestBody StudentDTO student) {
+        try {
+          studentService.addStudent(student);
+            return ResponseBuilder.buildResponsePayload("Student created!", HttpStatus.CREATED);
+        } catch (StudentAlreadyEnrolledException e) {
+            return ResponseBuilder.buildResponsePayload(String.format("Student already exists"),HttpStatus.CONFLICT);
+        }
     }
 
     @PutMapping("/{id}")

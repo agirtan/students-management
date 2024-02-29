@@ -4,7 +4,6 @@ import com.example.studentsmanager.DTOs.EnrollmentDTO;
 import com.example.studentsmanager.DTOs.EnrollmentRequest;
 import com.example.studentsmanager.DTOs.EnrollmentUpdateRequest;
 import com.example.studentsmanager.service.EnrollmentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -13,12 +12,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/enrollments")
 public class EnrollmentController {
-    @Autowired
-    private EnrollmentService enrollmentService;
+
+    private final EnrollmentService enrollmentService;
+
+    public EnrollmentController(EnrollmentService enrollmentService) {
+        this.enrollmentService = enrollmentService;
+    }
 
 
-
-//ADD
+    //ADD
 @PostMapping()
 public ResponseEntity<List<EnrollmentDTO>> enrollStudent(@RequestBody EnrollmentRequest request) {
     Long studentId = request.getStudentId();

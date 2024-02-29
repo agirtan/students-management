@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @AllArgsConstructor
+
 public class EnrollmentRequest {
 
     private Long studentId;

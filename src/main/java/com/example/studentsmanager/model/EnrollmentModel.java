@@ -11,6 +11,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name="enrollments")
+
 public class EnrollmentModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

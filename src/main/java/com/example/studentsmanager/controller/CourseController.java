@@ -14,7 +14,7 @@ public class CourseController {
 
     private final CourseService courseService;
 
-    @Autowired // Constructor injection is preferred
+    @Autowired
     public CourseController(CourseService courseService) {
         this.courseService = courseService;
     }

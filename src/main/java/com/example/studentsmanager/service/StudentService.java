@@ -3,6 +3,7 @@ package com.example.studentsmanager.service;
 import com.example.studentsmanager.DTOs.DTOConverter;
 import com.example.studentsmanager.DTOs.StudentDTO;
 import com.example.studentsmanager.exception.ResourceNotFoundException;
+import com.example.studentsmanager.exception.StudentAlreadyEnrolledException;
 import com.example.studentsmanager.exception.UserNotFound;
 import com.example.studentsmanager.model.CourseModel;
 import com.example.studentsmanager.model.EnrollmentModel;
@@ -47,15 +48,19 @@ public class StudentService {
         this.enrollmentRepository = enrollmentRepository;
     }
     //ADD STUDENT
-    public StudentDTO addStudent(StudentDTO studentDTO) {
+    public StudentDTO addStudent(StudentDTO studentDTO) throws StudentAlreadyEnrolledException {
+        // Check if a student with the given email already exists
+        if (studentRepository.existsByEmail(studentDTO.getEmail())) {
+            throw new StudentAlreadyEnrolledException("Student with email " + studentDTO.getEmail() + " is already enrolled.");
+        }
         // Generate a unique student code
         long studentCode;
         do {
-            studentCode = 100 + random.nextInt(MAX_STUDENT_CODE - 100 + 1); // Generates a number from 100 to 999
+            studentCode = 100 + random.nextInt(MAX_STUDENT_CODE - 100 + 1);
         } while (studentRepository.existsByStudentCode(studentCode));
 
         StudentModel studentModel = dtoConverter.convertToStudentEntity(studentDTO);
-        studentModel.setStudentCode(studentCode); // Set the unique code
+        studentModel.setStudentCode(studentCode);
         StudentModel savedStudent = studentRepository.save(studentModel);
 
         return dtoConverter.convertToStudentDTO(savedStudent);

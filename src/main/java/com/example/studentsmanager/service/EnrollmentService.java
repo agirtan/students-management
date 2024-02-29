@@ -5,6 +5,7 @@ import com.example.studentsmanager.DTOs.EnrollmentDTO;
 import com.example.studentsmanager.DTOs.EnrollmentUpdateRequest;
 import com.example.studentsmanager.exception.CourseNotFoundException;
 import com.example.studentsmanager.exception.ResourceNotFoundException;
+import com.example.studentsmanager.exception.StudentAlreadyEnrolledException;
 import com.example.studentsmanager.exception.UserNotFound;
 import com.example.studentsmanager.model.CourseModel;
 import com.example.studentsmanager.model.EnrollmentModel;
@@ -14,17 +15,19 @@ import com.example.studentsmanager.repository.EnrollmentRepository;
 import com.example.studentsmanager.repository.StudentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 
 
 @Service
+
 public class EnrollmentService {
 
 
-    private EnrollmentRepository enrollmentRepository;
-    private StudentRepository studentRepository;
-    private CourseRepository courseRepository;
+    private final EnrollmentRepository enrollmentRepository;
+    private final StudentRepository studentRepository;
+    private final CourseRepository courseRepository;
     private final DTOConverter dtoConverter;
 
 
@@ -39,6 +42,11 @@ public class EnrollmentService {
 
     @Transactional
     public EnrollmentDTO enrollStudent(Long studentId, Long courseId) {
+
+        boolean alreadyEnrolled = enrollmentRepository.existsByStudentIdAndCourseId(studentId, courseId);
+        if (alreadyEnrolled) {
+            throw new StudentAlreadyEnrolledException("Student " + studentId + " is already enrolled in course " + courseId);
+        }
         StudentModel student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new UserNotFound("Student not found with ID: " + studentId));
         CourseModel course = courseRepository.findById(courseId)

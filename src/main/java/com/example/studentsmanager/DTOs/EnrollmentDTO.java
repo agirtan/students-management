@@ -13,7 +13,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
+
 public class EnrollmentDTO {
+
     @JsonView(View.Public.class)
     private Long id;
     private StudentDTO student;
